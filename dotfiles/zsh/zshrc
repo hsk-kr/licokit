@@ -13,3 +13,61 @@ alias vi=nvim
 alias vim=nvim
 
 source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+
+# Navigation
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+
+# Editors
+export EDITOR='nvim'
+
+# History
+export HISTSIZE=32768
+export HISTFILESIZE="${HISTSIZE}"
+export HISTCONTROL='ignoreboth'
+
+# Encoding
+export PYTHONIOENCODING='UTF-8'
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
+
+# Aliases
+alias grep='grep --color=auto'
+alias path='echo -e ${PATH//:/\\n}'
+
+# macOS-specific
+if [[ "$(uname)" == "Darwin" ]]; then
+	alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+	alias localip="ipconfig getifaddr en0"
+	alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
+	alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
+	alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
+	alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
+	alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+	alias c="tr -d '\n' | pbcopy"
+fi
+
+# Functions
+mkd() { mkdir -p "$@" && cd "$_"; }
+fs() {
+	if du -b /dev/null > /dev/null 2>&1; then
+		local arg=-sbh
+	else
+		local arg=-sh
+	fi
+	if [[ -n "$@" ]]; then
+		du $arg -- "$@"
+	else
+		du $arg .[^.]* ./*
+	fi
+}
+tre() { tree -aC -I '.git|node_modules' --dirsfirst "$@" | less -FRNX; }
+digga() { dig +nocmd "$1" any +multiline +noall +answer; }
+gz() {
+	local origsize=$(wc -c < "$1")
+	local gzipsize=$(gzip -c "$1" | wc -c)
+	local ratio=$(echo "$gzipsize * 100 / $origsize" | bc -l)
+	printf "orig: %d bytes\n" "$origsize"
+	printf "gzip: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio"
+}
