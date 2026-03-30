@@ -30,7 +30,7 @@ Is this a coding task?
 
 ### When Both Apply
 - If a skill and agent cover the same domain, invoke the agent AND tell it to follow the skill
-- Example: For React work, invoke `react-specialist` agent and reference `react-expert` skill
+- Example: For React work, invoke `react-specialist` agent
 
 ## Agent Quick Reference
 

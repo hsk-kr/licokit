@@ -1,6 +1,6 @@
 ---
 name: frontend-developer
-description: "Use when building complete frontend applications across React, Vue, and Angular frameworks requiring multi-framework expertise and full-stack integration."
+description: "Use when building complete frontend applications requiring general web fundamentals, vanilla JS/TS, or frameworks without a dedicated specialist agent. For React-specific work, use react-specialist instead."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet
 ---
