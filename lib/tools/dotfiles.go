@@ -33,7 +33,10 @@ func SetupDotfiles(dotCfg config.DotfilesConfig) error {
 	} else {
 		sp := spinner.New("Updating licokit...")
 		sp.Start()
-		err = ExecCommandQuiet("git", "-C", licokitHomePath, "pull")
+		err = ExecCommandQuiet("git", "-C", licokitHomePath, "fetch", "origin")
+		if err == nil {
+			err = ExecCommandQuiet("git", "-C", licokitHomePath, "reset", "--hard", "origin/main")
+		}
 		sp.Stop()
 		if err != nil {
 			WarningMessage(fmt.Sprintf("git pull failed (offline?): %s", err.Error()))

@@ -156,9 +156,9 @@ func writePromptFiles(agents []AgentPane) ([]string, error) {
 
 func buildClaudeCommand(projectDir string, promptFile string) string {
 	if promptFile == "" {
-		return fmt.Sprintf("cd %s && claude", shellEscape(projectDir))
+		return fmt.Sprintf("cd %s && claude --dangerously-skip-permissions", shellEscape(projectDir))
 	}
-	return fmt.Sprintf("cd %s && claude --append-system-prompt-file %s", shellEscape(projectDir), shellEscape(promptFile))
+	return fmt.Sprintf("cd %s && claude --dangerously-skip-permissions --append-system-prompt-file %s", shellEscape(projectDir), shellEscape(promptFile))
 }
 
 func shellEscape(s string) string {
