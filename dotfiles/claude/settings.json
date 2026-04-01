@@ -80,5 +80,10 @@
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "voiceEnabled": false,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "permissions": {
+    "default": {
+      "mode": "auto"
+    }
+  }
 }
