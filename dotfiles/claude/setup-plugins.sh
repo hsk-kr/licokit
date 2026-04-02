@@ -52,6 +52,14 @@ if compgen -G "$CLAUDE_DIR/rules/*/" > /dev/null 2>&1; then
   done
 fi
 
+# Ensure common rules exist (copy from ECC plugin source if missing)
+ECC_PLUGIN_DIR="$CLAUDE_DIR/plugins/marketplaces/everything-claude-code"
+if [[ -d "$ECC_PLUGIN_DIR/rules/common" ]] && [[ ! -d "$CLAUDE_DIR/rules/common" ]]; then
+  echo "Restoring rules/common from ECC plugin"
+  mkdir -p "$CLAUDE_DIR/rules"
+  cp -r "$ECC_PLUGIN_DIR/rules/common" "$CLAUDE_DIR/rules/common"
+fi
+
 # Rename README.md in rules so it's not loaded as a rule
 if [[ -f "$CLAUDE_DIR/rules/README.md" ]]; then
   mv "$CLAUDE_DIR/rules/README.md" "$CLAUDE_DIR/rules/README"
