@@ -5,9 +5,12 @@ macOS dev environment bootstrapper TUI written in Go.
 ## Build & Run
 
 ```bash
-go build -o licokit .    # build
-go run .                  # run from source
-go test ./... -v          # run all tests
+go build -o licokit .          # build
+go run .                        # run from source
+go test ./... -v                # run all tests
+go test -race -cover ./...      # tests with race detection + coverage
+go vet ./...                    # static analysis
+gofmt -w .                      # format all files
 ```
 
 Requires Go 1.23+.
@@ -53,6 +56,14 @@ Creates tmux panes running Claude Code with role-specific system prompts. Pane b
 - Green = working
 - Red = needs permission
 - Gray = idle
+
+## Dotfiles / Claude Config
+
+`dotfiles/claude/` contains Claude Code configuration. Individual items are symlinked to `~/.claude/` via ExtraLinks (not the whole folder).
+
+**Tracked in git:** `CLAUDE.md`, `settings.json`, `hooks/`, `docs/`, `memory/`, `setup-plugins.sh`, `statusline-command.sh`
+
+**NOT tracked (ECC plugin auto-generates these):** `agents/`, `commands/`, `skills/`
 
 ## Release
 
