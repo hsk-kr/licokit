@@ -37,4 +37,38 @@ jq -r '.enabledPlugins // {} | to_entries[] | select(.value == true) | .key' "$S
   claude plugin install "$plugin" 2>/dev/null || echo "  (already installed or failed)"
 done
 
+# Clean up ECC artifacts — keep only common rules and no user skills (ECC plugin provides them)
+printf "\n--- Cleaning ECC artifacts ---\n"
+CLAUDE_DIR="$HOME/.claude"
+
+# Remove language-specific rules (ECC installs all languages; we only want common)
+for dir in "$CLAUDE_DIR"/rules/*/; do
+  dirname="$(basename "$dir")"
+  if [[ "$dirname" != "common" ]]; then
+    echo "Removing rules/$dirname (ECC artifact)"
+    rm -r "$dir"
+  fi
+done
+
+# Rename README.md in rules so it's not loaded as a rule
+if [[ -f "$CLAUDE_DIR/rules/README.md" ]]; then
+  mv "$CLAUDE_DIR/rules/README.md" "$CLAUDE_DIR/rules/README"
+fi
+
+# Remove user skills (ECC plugin provides them — no need for duplicates)
+for dir in "$CLAUDE_DIR"/skills/*/; do
+  dirname="$(basename "$dir")"
+  if [[ "$dirname" != "learned" ]]; then
+    rm -r "$dir"
+  fi
+done
+
+# Remove stale symlinks to dotfiles (ECC plugin provides agents/commands/skills)
+for link in "$CLAUDE_DIR/agents" "$CLAUDE_DIR/commands" "$CLAUDE_DIR/skills"; do
+  if [[ -L "$link" ]]; then
+    echo "Removing stale symlink: $link"
+    rm "$link"
+  fi
+done
+
 printf "\n=== Done ===\n"

@@ -65,6 +65,8 @@ Creates tmux panes running Claude Code with role-specific system prompts. Pane b
 
 **NOT tracked (ECC plugin auto-generates these):** `agents/`, `commands/`, `skills/`
 
+`setup-plugins.sh` installs plugins and then cleans up ECC artifacts: removes language-specific rules (keeps only `common/`), removes duplicate user skills (ECC plugin provides them), and removes stale symlinks.
+
 ## Release
 
 GitHub Actions builds arm64 macOS binary on `v*` tags via `ncipollo/release-action`.
