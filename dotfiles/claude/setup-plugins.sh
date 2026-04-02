@@ -42,13 +42,15 @@ printf "\n--- Cleaning ECC artifacts ---\n"
 CLAUDE_DIR="$HOME/.claude"
 
 # Remove language-specific rules (ECC installs all languages; we only want common)
-for dir in "$CLAUDE_DIR"/rules/*/; do
-  dirname="$(basename "$dir")"
-  if [[ "$dirname" != "common" ]]; then
-    echo "Removing rules/$dirname (ECC artifact)"
-    rm -r "$dir"
-  fi
-done
+if compgen -G "$CLAUDE_DIR/rules/*/" > /dev/null 2>&1; then
+  for dir in "$CLAUDE_DIR"/rules/*/; do
+    dirname="$(basename "$dir")"
+    if [[ "$dirname" != "common" ]]; then
+      echo "Removing rules/$dirname (ECC artifact)"
+      rm -r "$dir"
+    fi
+  done
+fi
 
 # Rename README.md in rules so it's not loaded as a rule
 if [[ -f "$CLAUDE_DIR/rules/README.md" ]]; then
@@ -56,12 +58,14 @@ if [[ -f "$CLAUDE_DIR/rules/README.md" ]]; then
 fi
 
 # Remove user skills (ECC plugin provides them — no need for duplicates)
-for dir in "$CLAUDE_DIR"/skills/*/; do
-  dirname="$(basename "$dir")"
-  if [[ "$dirname" != "learned" ]]; then
-    rm -r "$dir"
-  fi
-done
+if compgen -G "$CLAUDE_DIR/skills/*/" > /dev/null 2>&1; then
+  for dir in "$CLAUDE_DIR"/skills/*/; do
+    dirname="$(basename "$dir")"
+    if [[ "$dirname" != "learned" ]]; then
+      rm -r "$dir"
+    fi
+  done
+fi
 
 # Remove stale symlinks to dotfiles (ECC plugin provides agents/commands/skills)
 for link in "$CLAUDE_DIR/agents" "$CLAUDE_DIR/commands" "$CLAUDE_DIR/skills"; do
