@@ -83,4 +83,10 @@ for link in "$CLAUDE_DIR/agents" "$CLAUDE_DIR/commands" "$CLAUDE_DIR/skills"; do
   fi
 done
 
+# Update all installed plugins to latest versions
+if [[ -x "$SCRIPT_DIR/update-plugins.sh" ]]; then
+  printf "\n"
+  "$SCRIPT_DIR/update-plugins.sh"
+fi
+
 printf "\n=== Done ===\n"
