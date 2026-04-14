@@ -7,6 +7,11 @@
     "commit": "",
     "pr": ""
   },
+  "permissions": {
+    "default": {
+      "mode": "auto"
+    }
+  },
   "hooks": {
     "Notification": [
       {
@@ -24,6 +29,17 @@
           {
             "type": "command",
             "command": "terminal-notifier -group \"claude-$$\" -title 'Claude Code' -subtitle \"Permission Required - $(basename $PWD)\" -message 'Needs your approval' -sound 'default' 2>/dev/null; printf '\\a' > /dev/tty 2>/dev/null; exit 0"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "terminal-notifier -group \"claude-$$\" -title 'Claude Code' -subtitle \"Task Complete - $(basename $PWD)\" -message 'Claude finished' -sound 'Glass' 2>/dev/null; printf '\\a' > /dev/tty 2>/dev/null; exit 0"
           }
         ]
       }
@@ -81,10 +97,5 @@
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "voiceEnabled": false,
-  "skipDangerousModePermissionPrompt": true,
-  "permissions": {
-    "default": {
-      "mode": "auto"
-    }
-  }
+  "skipDangerousModePermissionPrompt": true
 }
