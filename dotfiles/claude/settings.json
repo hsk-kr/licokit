@@ -95,7 +95,8 @@
   },
   "language": "English",
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
+  "skipDangerousModePermissionPrompt": true,
   "voiceEnabled": false,
-  "skipDangerousModePermissionPrompt": true
+  "skipAutoPermissionPrompt": true
 }

@@ -52,7 +52,7 @@ Same pattern for prompts: `~/.config/licokit/prompts/*.md` → `lib/config/promp
 
 ## Claude Agents Feature
 
-Creates tmux panes running Claude Code with role-specific system prompts. Pane border colors reflect agent state via `@agent-status` per-pane tmux option (set by Claude Code hooks in `~/.claude/settings.json`):
+Creates tmux panes running Claude Code with role-specific system prompts. Pane border colors reflect agent state via `@agent-status` per-pane tmux option (set directly by licokit via `tmux set-option` in `lib/tools/agents.go`):
 - Green = working
 - Red = needs permission
 - Gray = idle

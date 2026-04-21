@@ -19,6 +19,7 @@ return {
 			"tailwindcss-language-server",
 			"yaml-language-server",
 			"delve",
+			"gopls",
 		},
 	},
 	config = true,

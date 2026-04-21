@@ -7,7 +7,6 @@ return {
 			ensure_installed = {
 				"css",
 				"dockerfile",
-				"elm",
 				"gitcommit",
 				"go",
 				"html",
@@ -18,12 +17,10 @@ return {
 				"markdown",
 				"markdown_inline",
 				"python",
-				"ruby",
 				"toml",
 				"tsx",
 				"typescript",
 				"vim",
-				"vimdoc",
 				"yaml",
 			},
 			highlight = {

@@ -179,4 +179,3 @@ func generateSessionName(projectDir string) string {
 		name = fmt.Sprintf("%s-%d", base, i)
 	}
 }
-
