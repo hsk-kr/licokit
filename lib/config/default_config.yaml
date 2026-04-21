@@ -52,6 +52,12 @@ tools:
     detect_type: command
     detect_value: nvim
 
+  - name: tree-sitter-cli
+    install_type: brew
+    package: tree-sitter-cli
+    detect_type: command
+    detect_value: tree-sitter
+
   - name: tmux
     install_type: brew
     package: tmux

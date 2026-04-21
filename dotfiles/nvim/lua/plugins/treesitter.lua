@@ -1,48 +1,44 @@
 return {
 	"nvim-treesitter/nvim-treesitter",
+	branch = "main",
 	lazy = false,
 	build = ":TSUpdate",
 	config = function()
-		require("nvim-treesitter.configs").setup({
-			ensure_installed = {
-				"css",
-				"dockerfile",
-				"gitcommit",
-				"go",
-				"html",
-				"javascript",
-				"json",
-				"lua",
-				"make",
-				"markdown",
-				"markdown_inline",
-				"python",
-				"toml",
-				"tsx",
-				"typescript",
-				"vim",
-				"yaml",
-			},
-			highlight = {
-				enable = true,
-			},
-			indent = {
-				enable = true,
-			},
-			endwise = {
-				enable = true,
-			},
-			sync_install = false,
-			auto_install = true,
-			incremental_selection = {
-				enable = true,
-				keymaps = {
-					-- init_selection = "gnn", -- set to `false` to disable one of the mappings
-					-- node_incremental = "grn",
-					-- scope_incremental = "grc",
-					-- node_decremental = "grm",
-				},
-			},
+		-- Compat shim: some plugins (e.g. telescope 0.1.x) still call the
+		-- old nvim-treesitter parsers.ft_to_lang(ft) which was removed in
+		-- the main-branch rewrite. Route it to the native API.
+		local parsers_ok, parsers = pcall(require, "nvim-treesitter.parsers")
+		if parsers_ok and not parsers.ft_to_lang then
+			parsers.ft_to_lang = function(ft)
+				return vim.treesitter.language.get_lang(ft) or ft
+			end
+		end
+
+		require("nvim-treesitter").install({
+			"css",
+			"dockerfile",
+			"gitcommit",
+			"go",
+			"html",
+			"javascript",
+			"json",
+			"lua",
+			"make",
+			"markdown",
+			"markdown_inline",
+			"python",
+			"toml",
+			"tsx",
+			"typescript",
+			"vim",
+			"yaml",
+		})
+
+		vim.api.nvim_create_autocmd("FileType", {
+			callback = function(args)
+				pcall(vim.treesitter.start, args.buf)
+				vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+			end,
 		})
 	end,
 }
