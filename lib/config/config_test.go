@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -95,9 +96,9 @@ func TestLoad_DefaultConfig_ToolCount(t *testing.T) {
 		t.Fatalf("Load() error: %v", err)
 	}
 
-	// Default config should have 19 tools
-	if len(cfg.Tools) != 19 {
-		t.Errorf("expected 19 tools, got %d", len(cfg.Tools))
+	// Default config should have 20 tools
+	if len(cfg.Tools) != 20 {
+		t.Errorf("expected 20 tools, got %d", len(cfg.Tools))
 	}
 }
 
@@ -115,6 +116,25 @@ func TestLoad_DefaultConfig_DotfilesConfigLinks(t *testing.T) {
 	for i, link := range expectedLinks {
 		if i < len(cfg.Dotfiles.ConfigLinks) && cfg.Dotfiles.ConfigLinks[i] != link {
 			t.Errorf("config link %d: got %q, want %q", i, cfg.Dotfiles.ConfigLinks[i], link)
+		}
+	}
+}
+
+func TestLoad_DefaultConfig_DoesNotLinkClaudeGlobalConfig(t *testing.T) {
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load() error: %v", err)
+	}
+
+	for _, link := range cfg.Dotfiles.ExtraLinks {
+		if strings.HasPrefix(link.Source, "claude/") || strings.Contains(link.Target, ".claude") {
+			t.Errorf("default dotfiles should not link Claude global config: source=%q target=%q", link.Source, link.Target)
+		}
+	}
+
+	for _, script := range cfg.Dotfiles.PostScripts {
+		if strings.HasPrefix(script, "claude/") {
+			t.Errorf("default dotfiles should not run Claude setup scripts: %q", script)
 		}
 	}
 }

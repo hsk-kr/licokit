@@ -39,7 +39,7 @@ curl -sL https://raw.githubusercontent.com/hsk-kr/licokit/main/install.sh | bash
 Browse and install dev tools through an interactive TUI with real-time status detection and a progress spinner. Tools are defined in a YAML config with version pinning support.
 
 <details>
-<summary><strong>Default tools (18)</strong></summary>
+<summary><strong>Default tools (20)</strong></summary>
 
 | Tool | Install Method | Category |
 |------|---------------|----------|
@@ -48,6 +48,7 @@ Browse and install dev tools through an interactive TUI with real-time status de
 | WezTerm | `brew install --cask` | Terminal |
 | Ghostty | `brew install --cask` | Terminal |
 | Neovim | `brew install` | Editor |
+| tree-sitter-cli | `brew install` | Parser Tooling |
 | tmux | `brew install` | Terminal Multiplexer |
 | AeroSpace | `brew install --cask` | Window Manager |
 | Neru | `brew install --cask` | Keyboard Navigation |
@@ -60,6 +61,7 @@ Browse and install dev tools through an interactive TUI with real-time status de
 | Go | `brew install` | Language |
 | nvm | `brew install` | Version Manager |
 | btop | `brew install` | System Monitor |
+| terminal-notifier | `brew install` | Notifications |
 | Claude Code | Script (`curl`) | AI Assistant |
 
 </details>
@@ -68,7 +70,7 @@ Browse and install dev tools through an interactive TUI with real-time status de
 
 ### 2. Dotfiles
 
-Sets up dotfiles that live **inside this repository** (`dotfiles/` directory) — no separate repo needed. Runs `git pull` to sync, then creates symlinks under `~/.config` and `~`.
+Sets up dotfiles that live **inside this repository** (`dotfiles/` directory) — no separate repo needed. Syncs the repo, then creates symlinks under `~/.config` and `~`.
 
 <details>
 <summary><strong>What gets symlinked</strong></summary>
@@ -93,23 +95,9 @@ Sets up dotfiles that live **inside this repository** (`dotfiles/` directory) �
 |--------|--------|
 | `scripts` | `~/scripts` |
 
-**Extra links**
-
-| Source | Target |
-|--------|--------|
-| `claude/skills` | `~/.claude/skills` |
-| `claude/agents` | `~/.claude/agents` |
-| `claude/commands` | `~/.claude/commands` |
-| `claude/docs` | `~/.claude/docs` |
-| `claude/hooks` | `~/.claude/hooks` |
-| `claude/settings.json` | `~/.claude/settings.json` |
-| `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
-| `claude/statusline-command.sh` | `~/.claude/statusline-command.sh` |
-
 **Post-setup scripts**
 
-- `claude/memory/sync-memories.sh` — syncs cross-session memory
-- `claude/setup-plugins.sh` — installs Claude Code plugins
+- `migrations/2026-05-05-detach-claude-global-links.sh` — detaches legacy Claude Code symlinks that still point into this repo
 
 </details>
 
@@ -125,7 +113,7 @@ The `dotfiles/` directory is a self-contained collection of configurations for t
 dotfiles/
 ├── aerospace/        # Window tiling
 ├── alacritty/        # Terminal
-├── claude/           # Claude Code (agents, skills, commands, hooks, memory)
+├── claude/           # Optional Claude Code templates and migration source
 ├── devdeck/          # Dashboard
 ├── ghostty/          # Terminal
 ├── karabiner/        # Key remapping
@@ -157,11 +145,8 @@ dotfiles:
     - tmux
   home_links:
     scripts: scripts
-  extra_links:
-    - source: claude/skills
-      target: ~/.claude/skills
   post_scripts:
-    - claude/setup-plugins.sh
+    - migrations/2026-05-05-detach-claude-global-links.sh
   zsh_source: "~/.config/zsh/zshrc"
 
 tools:

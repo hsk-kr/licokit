@@ -11,20 +11,8 @@ dotfiles:
     - ghostty
   home_links:
     scripts: scripts
-  extra_links:
-    - source: claude/docs
-      target: ~/.claude/docs
-    - source: claude/settings.json
-      target: ~/.claude/settings.json
-    - source: claude/CLAUDE.md
-      target: ~/.claude/CLAUDE.md
-    - source: claude/statusline-command.sh
-      target: ~/.claude/statusline-command.sh
-    - source: claude/hooks
-      target: ~/.claude/hooks
   post_scripts:
-    - claude/memory/sync-memories.sh
-    - claude/setup-plugins.sh
+    - migrations/2026-05-05-detach-claude-global-links.sh
   zsh_source: "~/.config/zsh/zshrc"
 
 tools:
