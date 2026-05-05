@@ -8,7 +8,7 @@ import (
 
 func Guide() {
 	bullets := []string{
-		"Install Tools before setting up Dotfiles. Dotfiles setup runs post-scripts that depend on installed tools (e.g., Claude Code plugins).",
+		"Install Tools before setting up Dotfiles. Dotfiles setup runs post-scripts that depend on installed tools.",
 		"Change the Homebrew click key to Shift + Command + F.",
 		"These commands assume you're using zsh. After installing wezterm, use your default terminal to install other software, then verify the results in wezterm.",
 		"When launching Karabiner Elements for the first time, it may reset the configuration, requiring you to reconfigure your dotfiles.",
