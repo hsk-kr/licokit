@@ -86,7 +86,6 @@ ctrl-cmd-t = 'exec-and-forget open -a Ghostty'
 ctrl-cmd-s = 'exec-and-forget open -a Slack'
 ctrl-cmd-w = 'exec-and-forget open -a Whatsapp'
 ctrl-cmd-k = 'exec-and-forget open -a KakaoTalk'
-ctrl-cmd-p = 'exec-and-forget open -a Telegram'
 ctrl-cmd-n = 'exec-and-forget open -a Notes'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#layout
