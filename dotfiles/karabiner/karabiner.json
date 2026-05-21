@@ -907,12 +907,12 @@
                   }
                 ],
                 "from": {
-                  "key_code": "p",
+                  "key_code": "c",
                   "modifiers": { "optional": ["any"] }
                 },
                 "to": [
                   {
-                    "key_code": "p",
+                    "key_code": "c",
                     "modifiers": ["left_control", "left_command"]
                   }
                 ],
