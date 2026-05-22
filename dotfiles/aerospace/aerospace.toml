@@ -83,7 +83,7 @@ outer.right =      5
 # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
 ctrl-cmd-b = 'exec-and-forget open -a "Google Chrome"'
 ctrl-cmd-t = 'exec-and-forget open -a Ghostty'
-ctrl-cmd-s = 'exec-and-forget open -a Slack'
+ctrl-cmd-m = 'exec-and-forget open -a Slack'
 ctrl-cmd-w = 'exec-and-forget open -a Whatsapp'
 ctrl-cmd-k = 'exec-and-forget open -a KakaoTalk'
 ctrl-cmd-c = 'exec-and-forget open -a codex'

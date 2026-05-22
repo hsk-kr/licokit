@@ -827,12 +827,12 @@
                   }
                 ],
                 "from": {
-                  "key_code": "s",
+                  "key_code": "m",
                   "modifiers": { "optional": ["any"] }
                 },
                 "to": [
                   {
-                    "key_code": "s",
+                    "key_code": "m",
                     "modifiers": ["left_control", "left_command"]
                   }
                 ],
