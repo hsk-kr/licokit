@@ -69,6 +69,29 @@
                 ],
                 "description": "Toggle Mouse Mode OFF",
                 "from": {
+                  "modifiers": { "optional": ["any"] },
+                  "simultaneous": [{ "key_code": "caps_lock" }]
+                },
+                "to": [
+                  {
+                    "set_variable": {
+                      "name": "mouse_mode",
+                      "value": 0
+                    }
+                  }
+                ],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "name": "mouse_mode",
+                    "type": "variable_if",
+                    "value": 1
+                  }
+                ],
+                "description": "Toggle Mouse Mode OFF",
+                "from": {
                   "modifiers": {
                     "mandatory": ["right_option"],
                     "optional": ["any"]
@@ -724,6 +747,29 @@
                     "set_variable": {
                       "name": "window_switch_mode",
                       "value": 1
+                    }
+                  }
+                ],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "name": "window_switch_mode",
+                    "type": "variable_if",
+                    "value": 1
+                  }
+                ],
+                "description": "Window Switch Mode OFF",
+                "from": {
+                  "modifiers": { "optional": ["any"] },
+                  "simultaneous": [{ "key_code": "caps_lock" }]
+                },
+                "to": [
+                  {
+                    "set_variable": {
+                      "name": "window_switch_mode",
+                      "value": 0
                     }
                   }
                 ],
