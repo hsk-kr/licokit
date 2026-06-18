@@ -135,7 +135,9 @@ function M.upscope_test_current_file()
 	-- Start async job -------------------------------------------------
 	-------------------------------------------------------------------
 
-	local command = { "upscope", "test", "api", "-t", relative_path }
+	relative_path = relative_path:gsub("^api/", "")
+
+	local command = { "upscope", "uv", "test", "api", relative_path }
 
 	M.job_id = vim.fn.jobstart(command, {
 		stdout_buffered = false,
@@ -207,7 +209,7 @@ function M.upscope_test_current_file_debug()
 	-- Start async job with debug flag --------------------------------
 	-------------------------------------------------------------------
 
-	local command = { "upscope", "test", "api", "-d", "-t", relative_path }
+	local command = { "upscope", "uv", "test", "api", relative_path }
 
 	M.job_id = vim.fn.jobstart(command, {
 		stdout_buffered = false,
