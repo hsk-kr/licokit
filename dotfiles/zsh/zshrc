@@ -71,3 +71,8 @@ gz() {
 	printf "orig: %d bytes\n" "$origsize"
 	printf "gzip: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio"
 }
+
+export EDITOR=nvim
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^e' edit-command-line
