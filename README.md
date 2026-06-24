@@ -101,7 +101,18 @@ Sets up dotfiles that live **inside this repository** (`dotfiles/` directory) �
 
 </details>
 
-### 3. Guide
+### 3. CPU Killer
+
+A background watchdog that kills any of **your** runaway processes. The rule: a process that stays above **90% CPU** (sampled every 30s) for **20 consecutive strikes (~10 minutes)** is terminated (`SIGTERM`, then `SIGKILL` if it ignores it) and you get a notification.
+
+- Select **CPU Killer → Enable** to install it as a `launchd` LaunchAgent. It starts immediately *and* on every login, and is kept alive 24/7.
+- Only the current user's processes are considered, so system/root daemons (`kernel_task`, `WindowServer`, `mds`, …) are never touched.
+- Script: `dotfiles/scripts/cpu-killer.sh` (symlinked to `~/scripts/cpu-killer.sh`).
+- Log: `tail -f /tmp/cpu-killer.log`
+- Tune without restarting: edit `~/.config/cpu-killer/config` — the daemon re-reads it within one interval. Overridable keys: `CPU_THRESHOLD`, `INTERVAL`, `STRIKES`, `KILL_GRACE`, `NOTIFY`, `LOG_FILE`, `EXCLUDE`.
+- **Disable** removes it from startup and stops it.
+
+### 4. Guide
 
 Built-in setup notes for configurations that need manual attention.
 

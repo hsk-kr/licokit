@@ -13,6 +13,8 @@ func Home(cfg *config.Config) {
 	}, {
 		Name: "Dotfiles",
 	}, {
+		Name: "CPU Killer",
+	}, {
 		Name: "Guide",
 	},
 	}
@@ -37,6 +39,10 @@ func Home(cfg *config.Config) {
 			} else {
 				tools.SuccessMessage("Dotfiles setup complete.\n\n• Dotfiles updated via git pull\n• Symlinks refreshed from ~/licokit/dotfiles\n• To apply zsh changes, run: source ~/.zshrc")
 			}
+		case "CPU Killer":
+			CPUKiller()
+			display.DisplayHeader(true)
+			continue
 		case "Guide":
 			Guide()
 		default:
