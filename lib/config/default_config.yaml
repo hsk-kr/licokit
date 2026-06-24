@@ -127,6 +127,12 @@ tools:
     detect_type: application
     detect_value: Ghostty.app
 
+  - name: Alacritty
+    install_type: cask
+    package: alacritty
+    detect_type: application
+    detect_value: Alacritty.app
+
   - name: btop
     install_type: brew
     package: btop
