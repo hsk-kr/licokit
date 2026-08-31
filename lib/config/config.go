@@ -19,6 +19,7 @@ type ExtraLink struct {
 
 type DotfilesConfig struct {
 	Repo        string            `yaml:"repo"`
+	RepoPath    string            `yaml:"repo_path"`
 	ConfigLinks []string          `yaml:"config_links"`
 	HomeLinks   map[string]string `yaml:"home_links"`
 	ExtraLinks  []ExtraLink       `yaml:"extra_links"`
@@ -39,6 +40,9 @@ type ToolConfig struct {
 	PostInstallWarning string   `yaml:"post_install_warning"`
 	PostInstallDirs    []string `yaml:"post_install_dirs"`
 	PostInstallScripts []string `yaml:"post_install_scripts"`
+	UpdateCommand      string   `yaml:"update_command"`
+	Profiles           []string `yaml:"profiles"`
+	Interactive        bool     `yaml:"interactive"`
 }
 
 // BrewPackage returns the brew package name with version pinning if specified.
@@ -52,6 +56,28 @@ func (t *ToolConfig) BrewPackage() string {
 type Config struct {
 	Dotfiles DotfilesConfig `yaml:"dotfiles"`
 	Tools    []ToolConfig   `yaml:"tools"`
+	Services ServicesConfig `yaml:"services"`
+}
+
+type ServicesConfig struct {
+	CPUKiller bool `yaml:"cpu_killer"`
+}
+
+// EnabledForProfile reports whether a tool belongs to the requested install
+// profile. The personal profile is a superset of core; all includes every
+// declared tool. Tools without a profile remain enabled for compatibility with
+// older user configs.
+func (t ToolConfig) EnabledForProfile(profile string) bool {
+	if profile == "all" || len(t.Profiles) == 0 {
+		return true
+	}
+
+	for _, candidate := range t.Profiles {
+		if candidate == profile || (profile == "personal" && candidate == "core") {
+			return true
+		}
+	}
+	return false
 }
 
 // Load reads the config from the user config path if it exists,

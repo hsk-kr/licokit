@@ -37,7 +37,7 @@ func Home(cfg *config.Config) {
 			if err := tools.SetupDotfiles(cfg.Dotfiles); err != nil {
 				tools.WarningMessage(err.Error())
 			} else {
-				tools.SuccessMessage("Dotfiles setup complete.\n\n• Dotfiles updated via git pull\n• Symlinks refreshed from ~/licokit/dotfiles\n• To apply zsh changes, run: source ~/.zshrc")
+				tools.SuccessMessage("Dotfiles setup complete.\n\n• Checkout updated safely with git pull --ff-only\n• Symlinks refreshed from ~/.local/share/licokit/repo/dotfiles\n• Existing files were preserved before replacement\n• To apply zsh changes, run: source ~/.zshrc")
 			}
 		case "CPU Killer":
 			CPUKiller()

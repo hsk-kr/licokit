@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -90,15 +91,14 @@ func TestLoad_DefaultConfig(t *testing.T) {
 	}
 }
 
-func TestLoad_DefaultConfig_ToolCount(t *testing.T) {
+func TestLoad_DefaultConfig_HasExpandedToolset(t *testing.T) {
 	cfg, err := Load()
 	if err != nil {
 		t.Fatalf("Load() error: %v", err)
 	}
 
-	// Default config should have 20 tools
-	if len(cfg.Tools) != 20 {
-		t.Errorf("expected 20 tools, got %d", len(cfg.Tools))
+	if len(cfg.Tools) < 40 {
+		t.Errorf("expected an expanded toolset, got only %d tools", len(cfg.Tools))
 	}
 }
 
@@ -108,7 +108,7 @@ func TestLoad_DefaultConfig_DotfilesConfigLinks(t *testing.T) {
 		t.Fatalf("Load() error: %v", err)
 	}
 
-	expectedLinks := []string{"aerospace", "devdeck", "karabiner", "neru", "nvim", "tmux", "zsh", "alacritty", "ghostty"}
+	expectedLinks := []string{"aerospace", "karabiner", "nvim", "opencode", "tmux", "zsh", "ghostty"}
 	if len(cfg.Dotfiles.ConfigLinks) != len(expectedLinks) {
 		t.Errorf("expected %d config links, got %d", len(expectedLinks), len(cfg.Dotfiles.ConfigLinks))
 	}
@@ -187,7 +187,7 @@ func TestLoad_InstallTypes(t *testing.T) {
 		t.Fatalf("Load() error: %v", err)
 	}
 
-	validInstallTypes := map[string]bool{"brew": true, "cask": true, "manual": true, "script": true}
+	validInstallTypes := map[string]bool{"brew": true, "cask": true, "manual": true, "mas": true, "script": true, "tap": true}
 	for _, tool := range cfg.Tools {
 		if !validInstallTypes[tool.InstallType] {
 			t.Errorf("Tool %q has invalid install_type: %q", tool.Name, tool.InstallType)
@@ -201,11 +201,27 @@ func TestLoad_DetectTypes(t *testing.T) {
 		t.Fatalf("Load() error: %v", err)
 	}
 
-	validDetectTypes := map[string]bool{"command": true, "application": true, "brew_package": true}
+	validDetectTypes := map[string]bool{"application": true, "brew_package": true, "brew_tap": true, "command": true, "package_receipt": true, "xcode": true}
 	for _, tool := range cfg.Tools {
 		if !validDetectTypes[tool.DetectType] {
 			t.Errorf("Tool %q has invalid detect_type: %q", tool.Name, tool.DetectType)
 		}
+	}
+}
+
+func TestToolEnabledForProfile(t *testing.T) {
+	core := ToolConfig{Profiles: []string{"core"}}
+	personal := ToolConfig{Profiles: []string{"personal"}}
+	legacy := ToolConfig{}
+
+	if !core.EnabledForProfile("core") || !core.EnabledForProfile("personal") {
+		t.Fatal("core tools should be enabled in core and personal profiles")
+	}
+	if personal.EnabledForProfile("core") || !personal.EnabledForProfile("personal") {
+		t.Fatal("personal tools should only be enabled in the personal profile")
+	}
+	if !core.EnabledForProfile("all") || !personal.EnabledForProfile("all") || !legacy.EnabledForProfile("core") {
+		t.Fatal("all and legacy profile behavior is incorrect")
 	}
 }
 
@@ -244,6 +260,53 @@ func TestLoad_BrewToolHasPackage(t *testing.T) {
 	for _, tool := range cfg.Tools {
 		if (tool.InstallType == "brew" || tool.InstallType == "cask") && tool.Package == "" {
 			t.Errorf("Tool %q has install_type=%s but no package", tool.Name, tool.InstallType)
+		}
+	}
+}
+
+func TestLoad_DefaultConfigManifestIsConsistent(t *testing.T) {
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load() error: %v", err)
+	}
+
+	seen := make(map[string]bool)
+	validProfiles := map[string]bool{"core": true, "personal": true}
+	for _, tool := range cfg.Tools {
+		if seen[tool.Name] {
+			t.Errorf("duplicate tool name %q", tool.Name)
+		}
+		seen[tool.Name] = true
+		for _, profile := range tool.Profiles {
+			if !validProfiles[profile] {
+				t.Errorf("tool %q has invalid profile %q", tool.Name, profile)
+			}
+		}
+		switch tool.InstallType {
+		case "brew", "cask", "tap":
+			if tool.Package == "" {
+				t.Errorf("tool %q requires a package", tool.Name)
+			}
+		case "mas":
+			if _, err := strconv.ParseUint(tool.Package, 10, 64); err != nil {
+				t.Errorf("tool %q has invalid App Store ID %q", tool.Name, tool.Package)
+			}
+		case "script":
+			if tool.InstallCommand == "" {
+				t.Errorf("tool %q requires an install command", tool.Name)
+			}
+		}
+	}
+
+	dotfilesRoot := filepath.Join("..", "..", "dotfiles")
+	for _, link := range cfg.Dotfiles.ConfigLinks {
+		if _, err := os.Stat(filepath.Join(dotfilesRoot, link)); err != nil {
+			t.Errorf("config link source %q is missing: %v", link, err)
+		}
+	}
+	for _, script := range cfg.Dotfiles.PostScripts {
+		if _, err := os.Stat(filepath.Join(dotfilesRoot, script)); err != nil {
+			t.Errorf("post-install script %q is missing: %v", script, err)
 		}
 	}
 }

@@ -53,7 +53,7 @@ func CPUKiller() {
 			}
 		case "Show paths & commands":
 			fmt.Println(styles.GuideText.Render(
-				" script:  ~/scripts/cpu-killer.sh (repo: ~/licokit/dotfiles/scripts/cpu-killer.sh)\n" +
+				" script:  ~/scripts/cpu-killer.sh (repo: ~/.local/share/licokit/repo/dotfiles/scripts/cpu-killer.sh)\n" +
 					" agent:   ~/Library/LaunchAgents/com.lico.cpu-killer.plist\n" +
 					" config:  ~/.config/cpu-killer/config\n" +
 					" log:     /tmp/cpu-killer.log\n" +

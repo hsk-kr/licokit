@@ -1,222 +1,138 @@
 <p align="center">
-  <h1 align="center">licokit</h1>
-  <p align="center">
-    A TUI tool that bootstraps your entire macOS dev environment after a fresh reset.<br/>
-    Select tools, sync dotfiles, get coding — all from one command.
-  </p>
+  <h1 align="center">LicoKit</h1>
+  <p align="center">A reproducible Apple Silicon macOS development setup.</p>
 </p>
 
-<p align="center">
-  <a href="#quick-install">Quick Install</a> ·
-  <a href="#features">Features</a> ·
-  <a href="#dotfiles">Dotfiles</a> ·
-  <a href="#configuration">Configuration</a> ·
-  <a href="#build">Build</a>
-</p>
+LicoKit installs and updates the software, runtimes, global developer tools, editor plugins, dotfiles, and background services used on Lico's laptop. It is designed to rebuild a freshly erased Mac without reusing the source checkout as the installed binary location.
 
----
+## Reset workflow
 
-## Target Environment
-
-| Category | Value |
-|----------|-------|
-| Device   | MacBook Air M1 |
-| OS       | macOS (darwin/arm64) |
-| Shell    | zsh |
-
-## Quick Install
+On the old Mac, update LicoKit and check reset safety:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/hsk-kr/licokit/main/install.sh | bash
+cd ~/licokit
+git pull --ff-only
+go run . doctor --profile personal --reset
 ```
 
-> Downloads the latest release binary to `~/licokit`, removes the macOS quarantine flag, and runs it.
+`doctor --reset` is read-only. It scans Git repositories below `~/dev` and `~/hobby`, plus the legacy `~/licokit` checkout, and fails if a branch has dirty files, no upstream, or commits absent from locally known remote refs. It never backs up, edits, commits, pushes, or deletes projects. Push any work you need to keep and rerun the check before erasing the Mac.
 
-## Features
+On the fresh Mac, use Safari to run:
 
-### 1. Tools Installation
-
-Browse and install dev tools through an interactive TUI with real-time status detection and a progress spinner. Tools are defined in a YAML config with version pinning support.
-
-<details>
-<summary><strong>Default tools (20)</strong></summary>
-
-| Tool | Install Method | Category |
-|------|---------------|----------|
-| Homebrew | Manual | Package Manager |
-| Git | `brew install` | Development |
-| WezTerm | `brew install --cask` | Terminal |
-| Ghostty | `brew install --cask` | Terminal |
-| Neovim | `brew install` | Editor |
-| tree-sitter-cli | `brew install` | Parser Tooling |
-| tmux | `brew install` | Terminal Multiplexer |
-| AeroSpace | `brew install --cask` | Window Manager |
-| Neru | `brew install --cask` | Keyboard Navigation |
-| Karabiner Elements | `brew install --cask` | Key Remapper |
-| Snipaste | `brew install --cask` | Screenshot |
-| ripgrep | `brew install` | Search |
-| fzf | `brew install` | Fuzzy Finder |
-| zsh-vi-mode | `brew install` | Shell Plugin |
-| Docker | `brew install --cask` | Containers |
-| Go | `brew install` | Language |
-| nvm | `brew install` | Version Manager |
-| btop | `brew install` | System Monitor |
-| terminal-notifier | `brew install` | Notifications |
-| Claude Code | Script (`curl`) | AI Assistant |
-
-</details>
-
-> **Note:** Homebrew must be installed first. The app will show the install command.
-
-### 2. Dotfiles
-
-Sets up dotfiles that live **inside this repository** (`dotfiles/` directory) — no separate repo needed. Syncs the repo, then creates symlinks under `~/.config` and `~`.
-
-<details>
-<summary><strong>What gets symlinked</strong></summary>
-
-**Config directories** → `~/.config/<name>`
-
-| Directory | Purpose |
-|-----------|---------|
-| `aerospace` | Tiling window manager |
-| `alacritty` | Terminal emulator |
-| `devdeck` | DevDeck dashboard |
-| `ghostty` | Terminal emulator |
-| `karabiner` | Key remapping |
-| `neru` | Keyboard-driven navigation |
-| `nvim` | Neovim (35+ plugins, LSP) |
-| `tmux` | Terminal multiplexer |
-| `zsh` | Shell configuration |
-
-**Home directory links** → `~/<name>`
-
-| Source | Target |
-|--------|--------|
-| `scripts` | `~/scripts` |
-
-**Post-setup scripts**
-
-- `migrations/2026-05-05-detach-claude-global-links.sh` — detaches legacy Claude Code symlinks that still point into this repo
-
-</details>
-
-### 3. CPU Killer
-
-A background watchdog that kills any of **your** runaway processes. The rule: a process that stays above **90% CPU** (sampled every 30s) for **20 consecutive strikes (~10 minutes)** is terminated (`SIGTERM`, then `SIGKILL` if it ignores it) and you get a notification.
-
-- Select **CPU Killer → Enable** to install it as a `launchd` LaunchAgent. It starts immediately *and* on every login, and is kept alive 24/7.
-- Only the current user's processes are considered, so system/root daemons (`kernel_task`, `WindowServer`, `mds`, …) are never touched.
-- Script: `dotfiles/scripts/cpu-killer.sh` (symlinked to `~/scripts/cpu-killer.sh`).
-- Log: `tail -f /tmp/cpu-killer.log`
-- Tune without restarting: edit `~/.config/cpu-killer/config` — the daemon re-reads it within one interval. Overridable keys: `CPU_THRESHOLD`, `INTERVAL`, `STRIKES`, `KILL_GRACE`, `NOTIFY`, `LOG_FILE`, `EXCLUDE`.
-- **Disable** removes it from startup and stops it.
-
-### 4. Guide
-
-Built-in setup notes for configurations that need manual attention.
-
-## Dotfiles
-
-The `dotfiles/` directory is a self-contained collection of configurations for the full dev environment:
-
+```bash
+curl -fsSL https://raw.githubusercontent.com/hsk-kr/licokit/main/install.sh | bash -s -- install --profile personal
 ```
-dotfiles/
-├── aerospace/        # Window tiling
-├── alacritty/        # Terminal
-├── claude/           # Optional Claude Code templates and migration source
-├── devdeck/          # Dashboard
-├── ghostty/          # Terminal
-├── karabiner/        # Key remapping
-├── neru/             # Keyboard navigation
-├── nvim/             # Neovim (lazy.nvim, LSP, custom scripts)
-├── opencode/         # OpenCode agents
-├── scripts/          # Utility scripts
-├── tmux/             # Terminal multiplexer
-├── tmux-md/          # Markdown-based tmux manager
-├── vscode/           # VS Code keybindings
-├── wezterm/          # Terminal (with backgrounds)
-└── zsh/              # Shell config
+
+The installer downloads the latest release assets from GitHub, verifies the SHA-256 checksum, and installs `licokit` to `~/.local/bin/licokit`. The first run may pause while macOS installs Command Line Tools; finish that system dialog and rerun the same command.
+
+Afterward, verify the result:
+
+```bash
+licokit doctor --profile personal
 ```
+
+## Commands
+
+```text
+licokit                                      interactive menu
+licokit install --profile personal           install/repair the laptop setup
+licokit install --profile personal --dry-run show the planned setup
+licokit update --profile personal            update packages, tools, and dotfiles
+licokit update --profile personal --dry-run  show the update plan
+licokit doctor --profile personal            inspect setup coverage
+licokit doctor --profile personal --reset    block on local-only project work
+licokit dotfiles                             safely refresh dotfile links
+licokit version
+```
+
+Profiles:
+
+- `core`: development environment and core applications.
+- `personal`: `core` plus the personal applications found on the audited laptop. This is the normal rebuild profile.
+- `all`: every item declared in the config, including future optional groups.
+
+## What is covered
+
+The default config currently declares 58 installable items.
+
+| Area | Coverage |
+|---|---|
+| macOS bootstrap | Command Line Tools, Rosetta 2, Homebrew |
+| Homebrew taps | anomalyco, AeroSpace, Supabase, y3owk1n |
+| Core CLI tools | Git, GitHub CLI, Neovim, tree-sitter, tmux, ripgrep, fzf, tree, jq, zsh-vi-mode, bison, Mercurial, p7zip, btop, terminal-notifier |
+| Languages/media/data | Go, nvm, Ruby, Python 3.13, Zig, ffmpeg, ImageMagick, yt-dlp, Supabase CLI |
+| Developer apps | Docker Desktop, Ghostty, AeroSpace, Homerow, Karabiner Elements, Snipaste, Chrome, Slack, ChatGPT |
+| AI/dev CLIs | Claude Code, Codex CLI, OpenCode, Bun, uv |
+| Personal apps | WhatsApp, CapCut, NordVPN, OBS, pgAdmin 4, Folx |
+| Mac App Store | Xcode, KakaoTalk, MKPlayer, Quick Camera |
+| Node | Node 24 and 26, default Node 24, npm, Corepack, pnpm 10.19, Yarn 1.22, Wrangler |
+| Go globals | air, asmfmt, delve, errcheck, fillstruct, godef, goimports, golangci-lint, gomodifytags, gopls, gotags, iferr, impl, motion, revive, staticcheck |
+| Editor/shell | lazy.nvim plugins, Mason tools, tmux plugin manager/plugins, Claude plugins, OpenCode plugin dependencies, managed zsh paths |
+| Service | High-CPU watchdog LaunchAgent |
+
+Mason manages the LSP/formatter/debugger set, including Bash, Biome, ESLint, Go, Harper, JSON, Lua, Markdown, Prettier, Python, Ruby, Tailwind, TypeScript, YAML, shellcheck, shfmt, stylua, and delve tooling.
+
+No project backup or project restore logic is included. GitHub remains the source of truth for repositories.
+
+## What macOS still requires
+
+Apple does not permit a bootstrap tool to silently finish every system-owned step. Expect to confirm or restore:
+
+- Apple/App Store, GitHub, SSH, Docker, VPN, ChatGPT, Slack, and other app sign-ins.
+- Accessibility/Input Monitoring for Homerow, AeroSpace, and Karabiner Elements.
+- Screen Recording, microphone/camera, notifications, Full Disk Access, VPN extensions, and other Privacy & Security permissions as used.
+- Any non-repository secrets, SSH private keys, certificates, browser state, databases, or app-local data you want to retain.
+
+LicoKit reports these as reminders rather than claiming they were automated.
+
+## Safe dotfiles
+
+The executable lives at `~/.local/bin/licokit`; its managed repository lives separately at `~/.local/share/licokit/repo`. This prevents the previous fresh-install collision where the executable occupied the intended clone directory.
+
+Dotfiles are linked from the managed checkout. If a regular target already exists, LicoKit moves it under `~/.local/state/licokit/backups/<timestamp>/` before creating the symlink. It will not hard-reset a dirty LicoKit checkout; updates use `git pull --ff-only`.
+
+Managed config links are AeroSpace, Karabiner Elements, Neovim, OpenCode, tmux, zsh, and Ghostty, plus `~/scripts`.
 
 ## Configuration
 
-The app ships with a sensible default config. Override it by creating:
-
-```
-~/.config/licokit/config.yaml
-```
-
-### Config Format
+Defaults are embedded from `lib/config/default_config.yaml`. To override them, create `~/.config/licokit/config.yaml`.
 
 ```yaml
 dotfiles:
-  config_links:
-    - nvim
-    - tmux
-  home_links:
-    scripts: scripts
-  post_scripts:
-    - migrations/2026-05-05-detach-claude-global-links.sh
+  repo: "https://github.com/hsk-kr/licokit.git"
+  repo_path: "~/.local/share/licokit/repo"
+  config_links: [nvim, tmux, zsh]
   zsh_source: "~/.config/zsh/zshrc"
+
+services:
+  cpu_killer: true
 
 tools:
   - name: Go
-    install_type: brew          # brew | cask | manual | script
+    install_type: brew       # brew | cask | tap | mas | script | manual
     package: go
-    version: "1.23"             # optional — pins to go@1.23
-    detect_type: command        # command | application | brew_package
+    detect_type: command     # command | application | brew_package | brew_tap | package_receipt | xcode
     detect_value: go
-
-  - name: Docker
-    install_type: cask
-    package: docker
-    detect_type: command
-    detect_value: docker
-
-  - name: Claude Code
-    install_type: script
-    install_command: "curl -fsSL https://claude.ai/install.sh | bash"
-    detect_type: command
-    detect_value: claude
-
-  - name: nvm
-    install_type: brew
-    package: nvm
-    detect_type: brew_package
-    detect_value: nvm
-    zsh_source: |               # optional — added to dev.zsh after install
-      export NVM_DIR="$HOME/.nvm"
-    post_install_dirs:          # optional — directories to create
-      - ~/.nvm
-    post_install_warning: "Run source ~/.zshrc"  # optional
+    profiles: [core]
 ```
 
-## Usage
+## Development
 
-### From Source
+Requires Go 1.23 or newer:
 
 ```bash
-# Prerequisites: Go 1.23+
 git clone https://github.com/hsk-kr/licokit.git
 cd licokit
-go run .
+go test ./...
+go run . install --profile personal --dry-run
+GOOS=darwin GOARCH=arm64 go build -o licokit-darwin-arm64 .
 ```
 
-### Navigation
+Release tags build `licokit-darwin-arm64` and `licokit-darwin-arm64.sha256`. The public installer refuses to install if checksum verification fails.
 
-| Key | Action |
-|-----|--------|
-| `j` / `J` / `h` / `H` | Move down |
-| `k` / `K` / `l` / `L` | Move up |
-| `Enter` | Select |
-| `ESC` | Back / Exit |
+## CPU killer
 
-## Build
-
-```bash
-GOOS=darwin GOARCH=arm64 go build -o licokit
-```
+The optional LaunchAgent checks only the current user's processes every 30 seconds. A process over 90% CPU for 20 consecutive checks is terminated and a notification is sent. Its script is linked to `~/scripts/cpu-killer.sh`; logs are in `/tmp/cpu-killer.log`, and overrides live in `~/.config/cpu-killer/config`.
 
 ## License
 

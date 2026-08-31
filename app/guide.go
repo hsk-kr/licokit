@@ -8,13 +8,12 @@ import (
 
 func Guide() {
 	bullets := []string{
-		"Install Tools before setting up Dotfiles. Dotfiles setup runs post-scripts that depend on installed tools.",
-		"Change the Homebrew click key to Shift + Command + F.",
-		"These commands assume you're using zsh. After installing wezterm, use your default terminal to install other software, then verify the results in wezterm.",
-		"When launching Karabiner Elements for the first time, it may reset the configuration, requiring you to reconfigure your dotfiles.",
-		"Homebrew should be installed by manually running the provided shell command.",
-		"You'll need to install Go and nvm to set up Language Server Protocol (LSP).",
-		"Remember to run source commands when needed (e.g., `source ~/.zshrc` or `NVM_PATH`).",
+		"Before erasing, run: licokit doctor --reset. It never edits projects and blocks on dirty or unpushed Git work.",
+		"After reinstalling macOS, run: licokit install --profile personal.",
+		"Use licokit update --profile personal to update Homebrew, App Store apps, standalone CLIs, dotfiles, runtimes, and plugins.",
+		"LicoKit preserves replaced config files under ~/.local/state/licokit/backups instead of deleting them.",
+		"macOS-owned dialogs, app sign-ins, SSH credentials, and Privacy & Security permissions still require confirmation.",
+		"When launching Karabiner Elements for the first time, approve its required macOS permissions before relying on mappings.",
 	}
 
 	for _, b := range bullets {

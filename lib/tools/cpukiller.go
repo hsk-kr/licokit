@@ -42,10 +42,11 @@ const cpuKillerPlist = `<?xml version="1.0" encoding="UTF-8"?>
 `
 
 // cpuKillerScript resolves the watchdog script path, preferring the dotfiles
-// symlink in ~/scripts and falling back to the repo copy under ~/licokit.
+// symlink in ~/scripts and falling back to the managed repo copy.
 func cpuKillerScript(home string) (string, error) {
 	candidates := []string{
 		filepath.Join(home, "scripts", "cpu-killer.sh"),
+		filepath.Join(defaultDotfilesRepoPath(home), "dotfiles", "scripts", "cpu-killer.sh"),
 		filepath.Join(home, "licokit", "dotfiles", "scripts", "cpu-killer.sh"),
 	}
 	for _, c := range candidates {

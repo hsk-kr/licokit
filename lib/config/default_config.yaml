@@ -1,146 +1,443 @@
 dotfiles:
+  repo: "https://github.com/hsk-kr/licokit.git"
+  repo_path: "~/.local/share/licokit/repo"
   config_links:
     - aerospace
-    - devdeck
     - karabiner
-    - neru
     - nvim
+    - opencode
     - tmux
     - zsh
-    - alacritty
     - ghostty
   home_links:
     scripts: scripts
   post_scripts:
     - migrations/2026-05-05-detach-claude-global-links.sh
+    - scripts/setup-development.sh
   zsh_source: "~/.config/zsh/zshrc"
 
+services:
+  cpu_killer: true
+
 tools:
+  # Bootstrap prerequisites. These may trigger macOS-owned dialogs.
+  - name: Command Line Tools
+    install_type: script
+    install_command: "xcode-select --install"
+    detect_type: xcode
+    detect_value: xcode-select
+    profiles: [core]
+    interactive: true
+
+  - name: Rosetta 2
+    install_type: script
+    install_command: "softwareupdate --install-rosetta --agree-to-license"
+    detect_type: package_receipt
+    detect_value: com.apple.pkg.RosettaUpdateAuto
+    profiles: [core]
+    interactive: true
+
   - name: Homebrew
-    install_type: manual
-    manual_message: 'You should install the homebrew manually. Use this command "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""'
+    install_type: script
+    install_command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
     detect_type: command
     detect_value: brew
+    profiles: [core]
+    interactive: true
 
+  # Taps used by this machine.
+  - name: anomalyco tap
+    install_type: tap
+    package: anomalyco/tap
+    detect_type: brew_tap
+    detect_value: anomalyco/tap
+    profiles: [core]
+
+  - name: AeroSpace tap
+    install_type: tap
+    package: nikitabobko/tap
+    detect_type: brew_tap
+    detect_value: nikitabobko/tap
+    profiles: [core]
+
+  - name: Supabase tap
+    install_type: tap
+    package: supabase/tap
+    detect_type: brew_tap
+    detect_value: supabase/tap
+    profiles: [core]
+
+  - name: y3owk1n tap
+    install_type: tap
+    package: y3owk1n/tap
+    detect_type: brew_tap
+    detect_value: y3owk1n/tap
+    profiles: [personal]
+
+  # Developer command-line tools.
   - name: Git
     install_type: brew
     package: git
-    detect_type: command
+    detect_type: brew_package
     detect_value: git
+    profiles: [core]
 
-  - name: WezTerm
-    install_type: cask
-    package: wezterm
-    detect_type: application
-    detect_value: WezTerm.app
+  - name: GitHub CLI
+    install_type: brew
+    package: gh
+    detect_type: command
+    detect_value: gh
+    profiles: [core]
 
   - name: Neovim
     install_type: brew
     package: neovim
     detect_type: command
     detect_value: nvim
+    profiles: [core]
 
   - name: tree-sitter-cli
     install_type: brew
     package: tree-sitter-cli
     detect_type: command
     detect_value: tree-sitter
+    profiles: [core]
 
   - name: tmux
     install_type: brew
     package: tmux
     detect_type: command
     detect_value: tmux
-
-  - name: AeroSpace
-    install_type: cask
-    package: nikitabobko/tap/aerospace
-    detect_type: application
-    detect_value: AeroSpace.app
-
-  - name: Neru
-    install_type: cask
-    package: y3owk1n/tap/neru
-    detect_type: application
-    detect_value: Neru.app
-
-  - name: Karabiner Elements
-    install_type: cask
-    package: karabiner-elements
-    detect_type: application
-    detect_value: Karabiner-Elements.app
-
-  - name: Snipaste
-    install_type: cask
-    package: snipaste
-    detect_type: application
-    detect_value: Snipaste.app
+    profiles: [core]
 
   - name: ripgrep
     install_type: brew
     package: ripgrep
-    detect_type: command
-    detect_value: rg
+    detect_type: brew_package
+    detect_value: ripgrep
+    profiles: [core]
 
   - name: fzf
     install_type: brew
     package: fzf
     detect_type: command
     detect_value: fzf
+    profiles: [core]
+
+  - name: tree
+    install_type: brew
+    package: tree
+    detect_type: command
+    detect_value: tree
+    profiles: [core]
+
+  - name: jq
+    install_type: brew
+    package: jq
+    detect_type: brew_package
+    detect_value: jq
+    profiles: [core]
 
   - name: zsh-vi-mode
     install_type: brew
     package: zsh-vi-mode
     detect_type: brew_package
     detect_value: zsh-vi-mode
-    zsh_source: "source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
-    post_install_warning: "Run source ~/.zshrc to use zsh-vi-mode without reopening the terminal."
+    profiles: [core]
 
-  - name: docker
-    install_type: cask
-    package: docker
-    detect_type: command
-    detect_value: docker
-
-  - name: go
+  - name: Go
     install_type: brew
     package: go
     detect_type: command
     detect_value: go
+    profiles: [core]
 
   - name: nvm
     install_type: brew
     package: nvm
     detect_type: brew_package
     detect_value: nvm
-    zsh_source: |-
-      export NVM_DIR="$HOME/.nvm"
-       [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"
-       [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
-    post_install_warning: "Run source ~/.zshrc to use nvm without reopening the terminal."
     post_install_dirs:
       - ~/.nvm
+    profiles: [core]
 
-  - name: Ghostty
-    install_type: cask
-    package: ghostty
-    detect_type: application
-    detect_value: Ghostty.app
+  - name: Ruby
+    install_type: brew
+    package: ruby
+    detect_type: brew_package
+    detect_value: ruby
+    profiles: [core]
+
+  - name: Python 3.13
+    install_type: brew
+    package: python@3.13
+    detect_type: brew_package
+    detect_value: python@3.13
+    profiles: [core]
+
+  - name: Zig
+    install_type: brew
+    package: zig
+    detect_type: command
+    detect_value: zig
+    profiles: [core]
+
+  - name: bison
+    install_type: brew
+    package: bison
+    detect_type: brew_package
+    detect_value: bison
+    profiles: [core]
+
+  - name: Mercurial
+    install_type: brew
+    package: mercurial
+    detect_type: command
+    detect_value: hg
+    profiles: [core]
+
+  - name: ffmpeg
+    install_type: brew
+    package: ffmpeg
+    detect_type: command
+    detect_value: ffmpeg
+    profiles: [core]
+
+  - name: ImageMagick
+    install_type: brew
+    package: imagemagick
+    detect_type: command
+    detect_value: magick
+    profiles: [core]
+
+  - name: p7zip
+    install_type: brew
+    package: p7zip
+    detect_type: command
+    detect_value: 7z
+    profiles: [core]
+
+  - name: yt-dlp
+    install_type: brew
+    package: yt-dlp
+    detect_type: command
+    detect_value: yt-dlp
+    profiles: [core]
+
+  - name: git-filter-repo
+    install_type: brew
+    package: git-filter-repo
+    detect_type: command
+    detect_value: git-filter-repo
+    profiles: [core]
 
   - name: btop
     install_type: brew
     package: btop
     detect_type: command
     detect_value: btop
+    profiles: [core]
 
   - name: terminal-notifier
     install_type: brew
     package: terminal-notifier
     detect_type: command
     detect_value: terminal-notifier
+    profiles: [core]
 
+  - name: mas
+    install_type: brew
+    package: mas
+    detect_type: command
+    detect_value: mas
+    profiles: [personal]
+
+  - name: Supabase CLI
+    install_type: brew
+    package: supabase/tap/supabase
+    detect_type: command
+    detect_value: supabase
+    profiles: [core]
+
+  - name: OpenCode
+    install_type: brew
+    package: anomalyco/tap/opencode
+    detect_type: command
+    detect_value: opencode
+    profiles: [core]
+
+  # Core applications and required fonts.
+  - name: Docker Desktop
+    install_type: cask
+    package: docker-desktop
+    detect_type: application
+    detect_value: Docker.app
+    profiles: [core]
+
+  - name: Ghostty
+    install_type: cask
+    package: ghostty
+    detect_type: application
+    detect_value: Ghostty.app
+    profiles: [core]
+
+  - name: Ubuntu Sans Nerd Font
+    install_type: cask
+    package: font-ubuntu-sans-nerd-font
+    detect_type: brew_package
+    detect_value: font-ubuntu-sans-nerd-font
+    profiles: [core]
+
+  - name: AeroSpace
+    install_type: cask
+    package: nikitabobko/tap/aerospace
+    detect_type: application
+    detect_value: AeroSpace.app
+    profiles: [core]
+
+  - name: Homerow
+    install_type: cask
+    package: homerow
+    detect_type: application
+    detect_value: Homerow.app
+    profiles: [core]
+
+  - name: Karabiner Elements
+    install_type: cask
+    package: karabiner-elements
+    detect_type: application
+    detect_value: Karabiner-Elements.app
+    profiles: [core]
+
+  - name: Snipaste
+    install_type: cask
+    package: snipaste
+    detect_type: application
+    detect_value: Snipaste.app
+    profiles: [core]
+
+  - name: Google Chrome
+    install_type: cask
+    package: google-chrome
+    detect_type: application
+    detect_value: Google Chrome.app
+    profiles: [core]
+
+  - name: Slack
+    install_type: cask
+    package: slack
+    detect_type: application
+    detect_value: Slack.app
+    profiles: [core]
+
+  - name: ChatGPT
+    install_type: cask
+    package: chatgpt
+    detect_type: application
+    detect_value: ChatGPT.app
+    profiles: [core]
+
+  # Official standalone installers. Re-running each installer updates the tool.
   - name: Claude Code
     install_type: script
     install_command: "curl -fsSL https://claude.ai/install.sh | bash"
+    update_command: "claude update"
     detect_type: command
     detect_value: claude
+    profiles: [core]
+
+  - name: Codex CLI
+    install_type: script
+    install_command: "curl -fsSL https://chatgpt.com/codex/install.sh | sh"
+    update_command: "curl -fsSL https://chatgpt.com/codex/install.sh | sh"
+    detect_type: command
+    detect_value: codex
+    profiles: [core]
+
+  - name: Bun
+    install_type: script
+    install_command: "curl -fsSL https://bun.com/install | bash"
+    update_command: "bun upgrade --stable"
+    detect_type: command
+    detect_value: bun
+    profiles: [core]
+
+  - name: uv
+    install_type: script
+    install_command: "curl -LsSf https://astral.sh/uv/install.sh | sh"
+    update_command: "uv self update"
+    detect_type: command
+    detect_value: uv
+    profiles: [core]
+
+  # Personal applications found on the current laptop.
+  - name: WhatsApp
+    install_type: cask
+    package: whatsapp
+    detect_type: application
+    detect_value: WhatsApp.app
+    profiles: [personal]
+
+  - name: CapCut
+    install_type: cask
+    package: capcut
+    detect_type: application
+    detect_value: CapCut.app
+    profiles: [personal]
+
+  - name: NordVPN
+    install_type: cask
+    package: nordvpn
+    detect_type: application
+    detect_value: NordVPN.app
+    profiles: [personal]
+
+  - name: OBS
+    install_type: cask
+    package: obs
+    detect_type: application
+    detect_value: OBS.app
+    profiles: [personal]
+
+  - name: pgAdmin 4
+    install_type: cask
+    package: pgadmin4
+    detect_type: application
+    detect_value: pgAdmin 4.app
+    profiles: [personal]
+
+  - name: Folx
+    install_type: cask
+    package: folx
+    detect_type: application
+    detect_value: Folx.app
+    profiles: [personal]
+
+  # Mac App Store applications. mas still requires the Apple account to be signed in.
+  - name: Xcode
+    install_type: mas
+    package: "497799835"
+    detect_type: application
+    detect_value: Xcode.app
+    profiles: [personal]
+
+  - name: KakaoTalk
+    install_type: mas
+    package: "869223134"
+    detect_type: application
+    detect_value: KakaoTalk.app
+    profiles: [personal]
+
+  - name: MKPlayer
+    install_type: mas
+    package: "1335612105"
+    detect_type: application
+    detect_value: MKPlayer.app
+    profiles: [personal]
+
+  - name: Quick Camera
+    install_type: mas
+    package: "598853070"
+    detect_type: application
+    detect_value: Quick Camera.app
+    profiles: [personal]

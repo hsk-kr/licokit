@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -22,17 +23,16 @@ func RenderItem(name string, disabled bool) {
 }
 
 func ExistCommand(cmd string) bool {
-	_, err := exec.Command("zsh", "-l", "-c", fmt.Sprintf("which %s", cmd)).Output()
-
-	if err != nil {
-		return false
-	}
-
-	return true
+	_, err := exec.LookPath(cmd)
+	return err == nil
 }
 
 func ExistBrewPackage(packageName string) bool {
-	_, err := exec.Command("brew", "list", packageName).Output()
+	brew, err := exec.LookPath("brew")
+	if err != nil {
+		return false
+	}
+	_, err = exec.Command(brew, "list", packageName).Output()
 
 	if err != nil {
 		return false
@@ -41,10 +41,67 @@ func ExistBrewPackage(packageName string) bool {
 	return true
 }
 
+func ExistBrewTap(tap string) bool {
+	brew, err := exec.LookPath("brew")
+	if err != nil {
+		return false
+	}
+	output, err := exec.Command(brew, "tap").Output()
+	if err != nil {
+		return false
+	}
+	for _, installed := range strings.Fields(string(output)) {
+		if installed == tap {
+			return true
+		}
+	}
+	return false
+}
+
 func ExistApplication(appName string) bool {
-	appPath := filepath.Join("/Applications", appName)
-	_, err := os.Stat(appPath)
-	return err == nil
+	paths := []string{filepath.Join("/Applications", appName)}
+	if home, err := os.UserHomeDir(); err == nil {
+		paths = append(paths, filepath.Join(home, "Applications", appName))
+	}
+	for _, appPath := range paths {
+		if _, err := os.Stat(appPath); err == nil {
+			return true
+		}
+	}
+	return false
+}
+
+// RefreshHomebrewEnvironment makes a newly installed Homebrew available to the
+// running process. This avoids requiring a terminal restart in the middle of a
+// full bootstrap.
+func RefreshHomebrewEnvironment() {
+	for _, candidate := range []string{"/opt/homebrew/bin/brew", "/usr/local/bin/brew"} {
+		if _, err := os.Stat(candidate); err != nil {
+			continue
+		}
+		prefix := filepath.Dir(filepath.Dir(candidate))
+		path := os.Getenv("PATH")
+		bin := filepath.Join(prefix, "bin")
+		sbin := filepath.Join(prefix, "sbin")
+		if !pathContains(path, bin) {
+			path = bin + string(os.PathListSeparator) + path
+		}
+		if !pathContains(path, sbin) {
+			path = sbin + string(os.PathListSeparator) + path
+		}
+		_ = os.Setenv("PATH", path)
+		_ = os.Setenv("HOMEBREW_PREFIX", prefix)
+		return
+	}
+}
+
+func pathContains(path, candidate string) bool {
+	for _, item := range filepath.SplitList(path) {
+		if item == candidate {
+			return true
+		}
+	}
+	return false
 }
 
 func ExecCommand(command string, args ...string) error {
@@ -67,22 +124,42 @@ func ExecCommand(command string, args ...string) error {
 // Used when a spinner is showing progress instead.
 func ExecCommandQuiet(command string, args ...string) error {
 	cmd := exec.Command(command, args...)
+	var output bytes.Buffer
+	cmd.Stdout = &output
+	cmd.Stderr = &output
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("failed to start %s: %w", command, err)
 	}
 
 	if err := cmd.Wait(); err != nil {
+		detail := strings.TrimSpace(output.String())
+		if detail != "" {
+			return fmt.Errorf("%s failed: %w: %s", command, err, detail)
+		}
 		return fmt.Errorf("%s failed: %w", command, err)
 	}
 
 	return nil
 }
 
-/*
-Add the source to ~/licokit/dev.zsh
+func commandOutput(command string, args ...string) (string, error) {
+	cmd := exec.Command(command, args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		detail := strings.TrimSpace(string(output))
+		if detail != "" {
+			return "", fmt.Errorf("%s failed: %w: %s", command, err, detail)
+		}
+		return "", fmt.Errorf("%s failed: %w", command, err)
+	}
+	return string(output), nil
+}
 
-It will insert the line to import dev.zsh from .zshrc if it's not setup.
+/*
+Add a source line to ~/.config/licokit/sources.zsh.
+
+It will insert a small managed block into .zshrc if it is not set up.
 
 If the source exists in the dev.zsh, it will be ignored.
 */
@@ -94,10 +171,10 @@ func AddZshSource(source string) error {
 		return err
 	}
 
-	licokitHomePath := filepath.Join(homePath, "licokit")
-	licokitZshPath := filepath.Join(licokitHomePath, "dev.zsh")
+	licokitConfigPath := filepath.Join(homePath, ".config", "licokit")
+	licokitZshPath := filepath.Join(licokitConfigPath, "sources.zsh")
 	zshrcPath := filepath.Join(homePath, ".zshrc")
-	if err := ExecCommand("mkdir", "-p", licokitHomePath); err != nil {
+	if err := os.MkdirAll(licokitConfigPath, 0o755); err != nil {
 		return err
 	}
 
@@ -121,7 +198,11 @@ func AddZshSource(source string) error {
 			}
 		}
 
-		err = appendFile(licokitZshPath, fmt.Sprintf("\n%s", source))
+		prefix := ""
+		if exist {
+			prefix = "\n"
+		}
+		err = appendFile(licokitZshPath, prefix+source+"\n")
 		return err
 	}
 
@@ -133,8 +214,9 @@ func AddZshSource(source string) error {
 			return err
 		}
 
+		managedBlock := fmt.Sprintf("# >>> licokit >>>\n[ -f %q ] && source %q\n# <<< licokit <<<", licokitZshPath, licokitZshPath)
 		if exist {
-			contains, err := containInFile(zshrcPath, licokitZshPath)
+			contains, err := containInFile(zshrcPath, "# >>> licokit >>>")
 
 			if err != nil {
 				return err
@@ -145,7 +227,11 @@ func AddZshSource(source string) error {
 			}
 		}
 
-		err = appendFile(zshrcPath, fmt.Sprintf("\nsource %s", licokitZshPath))
+		prefix := ""
+		if exist {
+			prefix = "\n"
+		}
+		err = appendFile(zshrcPath, prefix+managedBlock+"\n")
 		return err
 	}
 

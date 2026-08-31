@@ -8,11 +8,11 @@ OS: MacOS M Chip
 
 |Tool Name|Usage|url|
 |---|---|---|
-|WezTerm|Terminal Emulator|https://wezfurlong.org/wezterm/index.html|
+|Ghostty|Terminal Emulator|https://ghostty.org/|
 |Neovim|Code Editor|https://neovim.io/|
 |Snipaste|Capturing Tool|https://www.snipaste.com/index.html|
 |Aerospace|Window Tile Manager|https://github.com/nikitabobko/AeroSpace|
 |Karabiner Elements|Keyboard Customizer|https://karabiner-elements.pqrs.org/|
-|Neru|Keyboard-Driven Navigation|https://github.com/y3owk1n/neru|
+|Homerow|Keyboard-Driven Navigation|https://www.homerow.app/|
 |zsh-vi-mode|brew install zsh-vi-mode|https://github.com/jeffreytse/zsh-vi-mode|
 |fzf|interactive filter program|https://github.com/junegunn/fzf

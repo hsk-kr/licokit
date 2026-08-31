@@ -3,6 +3,7 @@ package tools
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/hsk-kr/licokit/lib/config"
@@ -30,17 +31,40 @@ func Install(tool config.ToolConfig) error {
 		if err != nil {
 			return err
 		}
-	case "script":
+	case "tap":
+		sp := spinner.New(fmt.Sprintf("Adding %s...", tool.Name))
+		sp.Start()
+		err := ExecCommandQuiet("brew", "tap", tool.Package)
+		sp.Stop()
+		if err != nil {
+			return err
+		}
+	case "mas":
 		sp := spinner.New(fmt.Sprintf("Installing %s...", tool.Name))
 		sp.Start()
-		err := ExecCommandQuiet("bash", "-c", tool.InstallCommand)
+		err := ExecCommandQuiet("mas", "install", tool.Package)
 		sp.Stop()
+		if err != nil {
+			return err
+		}
+	case "script":
+		var err error
+		if tool.Interactive {
+			fmt.Printf("Installing %s...\n", tool.Name)
+			err = ExecCommand("bash", "-c", tool.InstallCommand)
+		} else {
+			sp := spinner.New(fmt.Sprintf("Installing %s...", tool.Name))
+			sp.Start()
+			err = ExecCommandQuiet("bash", "-c", tool.InstallCommand)
+			sp.Stop()
+		}
 		if err != nil {
 			return err
 		}
 	default:
 		return fmt.Errorf("unknown install type: %s", tool.InstallType)
 	}
+	RefreshHomebrewEnvironment()
 
 	// Create post-install directories
 	for _, dir := range tool.PostInstallDirs {
@@ -85,6 +109,12 @@ func IsInstalled(tool config.ToolConfig) (bool, error) {
 		return ExistApplication(tool.DetectValue), nil
 	case "brew_package":
 		return ExistBrewPackage(tool.DetectValue), nil
+	case "brew_tap":
+		return ExistBrewTap(tool.DetectValue), nil
+	case "package_receipt":
+		return exec.Command("pkgutil", "--pkg-info", tool.DetectValue).Run() == nil, nil
+	case "xcode":
+		return exec.Command("xcode-select", "-p").Run() == nil, nil
 	default:
 		return false, fmt.Errorf("unknown detect type: %s", tool.DetectType)
 	}
