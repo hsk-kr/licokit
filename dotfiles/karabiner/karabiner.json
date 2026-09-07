@@ -1003,6 +1003,26 @@
                   }
                 ],
                 "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "name": "window_switch_mode",
+                    "type": "variable_if",
+                    "value": 1
+                  }
+                ],
+                "from": {
+                  "key_code": "g",
+                  "modifiers": { "optional": ["any"] }
+                },
+                "to": [
+                  {
+                    "key_code": "g",
+                    "modifiers": ["left_control", "left_command"]
+                  }
+                ],
+                "type": "basic"
               }
             ]
           },
