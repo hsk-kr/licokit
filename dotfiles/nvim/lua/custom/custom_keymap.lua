@@ -15,10 +15,6 @@ vim.api.nvim_set_keymap("n", "<leader>dvn", ":DiffviewOpen origin/main<CR>", { n
 -- Neogit
 vim.api.nvim_set_keymap("n", "<leader>ng", ":Neogit<CR>", { noremap = true, silent = true })
 
--- Rest
-vim.api.nvim_set_keymap("n", "<leader>rr", ":Rest run<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>rl", ":Rest last<CR>", { noremap = true, silent = true })
-
 -- neoclip
 vim.api.nvim_set_keymap("n", '<leader>"', ":Telescope neoclip<CR>", { noremap = true, silent = true })
 
@@ -28,7 +24,6 @@ vim.api.nvim_set_keymap("n", "<leader>fs", ":Telescope lsp_document_symbols<CR>"
 -- Custom
 vim.api.nvim_set_keymap("n", "<Esc>", ":noh<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>mm", ":e ~/memo<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>mr", ":e ~/rest.http<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>cp", ":cprev<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>cn", ":cn<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap(
@@ -55,18 +50,18 @@ vim.api.nvim_set_keymap("n", "<leader>upt", ":LicovimTestRunnerToggle<CR>", { no
 
 -- open selected text as URL in default browser
 vim.keymap.set("x", "O", function()
-	local vstart = vim.fn.getpos("v")
-	local vend = vim.fn.getpos(".")
-	local line_start = vstart[2]
-	local line_end = vend[2]
-	if line_start > line_end then
-		line_start, line_end = line_end, line_start
-	end
-	local lines = vim.api.nvim_buf_get_lines(0, line_start - 1, line_end, false)
-	local text = vim.fn.trim(table.concat(lines, ""))
-	if text ~= "" then
-		vim.fn.jobstart({ "open", text }, { detach = true })
-	end
+  local vstart = vim.fn.getpos("v")
+  local vend = vim.fn.getpos(".")
+  local line_start = vstart[2]
+  local line_end = vend[2]
+  if line_start > line_end then
+    line_start, line_end = line_end, line_start
+  end
+  local lines = vim.api.nvim_buf_get_lines(0, line_start - 1, line_end, false)
+  local text = vim.fn.trim(table.concat(lines, ""))
+  if text ~= "" then
+    vim.fn.jobstart({ "open", text }, { detach = true })
+  end
 end, { noremap = true, silent = true, desc = "Open selected text as URL in browser" })
 
 -- disable close window shortcuts, accidently pressing those button is so annoying
