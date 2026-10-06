@@ -15,8 +15,6 @@ vim.api.nvim_set_keymap("n", "<leader>dvn", ":DiffviewOpen origin/main<CR>", { n
 -- Neogit
 vim.api.nvim_set_keymap("n", "<leader>ng", ":Neogit<CR>", { noremap = true, silent = true })
 
--- neoclip
-vim.api.nvim_set_keymap("n", '<leader>"', ":Telescope neoclip<CR>", { noremap = true, silent = true })
 
 -- lsp
 vim.api.nvim_set_keymap("n", "<leader>fs", ":Telescope lsp_document_symbols<CR>", { noremap = true, silent = true })
