@@ -55,7 +55,7 @@ local function apply_scheme(scheme)
 end
 local function init_scheme()
 	local config = get_config()
-	local scheme = config.scheme or "default"
+	local scheme = config.scheme or "tokyonight-night"
 	apply_scheme(scheme)
 end
 local function pick_scheme()
