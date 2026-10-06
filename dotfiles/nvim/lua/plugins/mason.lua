@@ -29,7 +29,6 @@ return {
 				"prettierd",
 				"pyright",
 				"python-lsp-server",
-				"ruby-lsp",
 				"tailwindcss-language-server",
 				"typescript-language-server",
 				"yaml-language-server",
