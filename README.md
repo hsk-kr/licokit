@@ -53,7 +53,7 @@ Profiles:
 
 ## What is covered
 
-The default config currently declares 58 installable items.
+The default config currently declares 59 installable items.
 
 | Area | Coverage |
 |---|---|
@@ -67,7 +67,7 @@ The default config currently declares 58 installable items.
 | Mac App Store | Xcode, KakaoTalk, MKPlayer, Quick Camera |
 | Node | Node 24 and 26, default Node 24, npm, Corepack, pnpm 10.19, Yarn 1.22, Wrangler |
 | Go globals | air, asmfmt, delve, errcheck, fillstruct, godef, goimports, golangci-lint, gomodifytags, gopls, gotags, iferr, impl, motion, revive, staticcheck |
-| Editor/shell | lazy.nvim plugins, Mason tools, tmux plugin manager/plugins, Claude plugins, OpenCode plugin dependencies, managed zsh paths |
+| Editor/shell | lazy.nvim plugins, Mason tools, tmux plugin manager/plugins, Claude plugins, Claude team slash commands (upscopeio/claude-skills, cloned to `~/dev/claude-skills`), OpenCode plugin dependencies, managed zsh paths |
 | Service | High-CPU watchdog LaunchAgent |
 
 Mason manages the LSP/formatter/debugger set, including Bash, Biome, ESLint, Go, Harper, JSON, Lua, Markdown, Prettier, Python, Ruby, Tailwind, TypeScript, YAML, shellcheck, shfmt, stylua, and delve tooling.
@@ -111,7 +111,7 @@ tools:
   - name: Go
     install_type: brew       # brew | cask | tap | mas | script | manual
     package: go
-    detect_type: command     # command | application | brew_package | brew_tap | package_receipt | xcode
+    detect_type: command     # command | application | brew_package | brew_tap | package_receipt | xcode | path
     detect_value: go
     profiles: [core]
 ```

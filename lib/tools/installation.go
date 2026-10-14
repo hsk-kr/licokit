@@ -115,6 +115,8 @@ func IsInstalled(tool config.ToolConfig) (bool, error) {
 		return exec.Command("pkgutil", "--pkg-info", tool.DetectValue).Run() == nil, nil
 	case "xcode":
 		return exec.Command("xcode-select", "-p").Run() == nil, nil
+	case "path":
+		return existFile(config.ExpandPath(tool.DetectValue))
 	default:
 		return false, fmt.Errorf("unknown detect type: %s", tool.DetectType)
 	}

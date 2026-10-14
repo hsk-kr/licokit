@@ -201,7 +201,7 @@ func TestLoad_DetectTypes(t *testing.T) {
 		t.Fatalf("Load() error: %v", err)
 	}
 
-	validDetectTypes := map[string]bool{"application": true, "brew_package": true, "brew_tap": true, "command": true, "package_receipt": true, "xcode": true}
+	validDetectTypes := map[string]bool{"application": true, "brew_package": true, "brew_tap": true, "command": true, "package_receipt": true, "path": true, "xcode": true}
 	for _, tool := range cfg.Tools {
 		if !validDetectTypes[tool.DetectType] {
 			t.Errorf("Tool %q has invalid detect_type: %q", tool.Name, tool.DetectType)

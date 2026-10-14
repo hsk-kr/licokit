@@ -346,6 +346,26 @@ tools:
     detect_value: claude
     profiles: [core]
 
+  # Shared Claude Code slash commands: clone the repo and symlink each
+  # commands/*.md into ~/.claude/commands. Updates pull and re-link so new
+  # commands appear. A clone failure (no SSH access) is reported, not fatal.
+  - name: Claude team commands
+    install_type: script
+    install_command: >-
+      GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
+      git clone git@github.com:upscopeio/claude-skills.git "$HOME/dev/claude-skills" &&
+      mkdir -p "$HOME/.claude/commands" &&
+      for f in "$HOME"/dev/claude-skills/commands/*.md; do if [ -e "$f" ]; then ln -sf "$f" "$HOME/.claude/commands/"; fi; done
+    update_command: >-
+      GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
+      git -C "$HOME/dev/claude-skills" pull --ff-only; rc=$?;
+      mkdir -p "$HOME/.claude/commands" &&
+      for f in "$HOME"/dev/claude-skills/commands/*.md; do if [ -e "$f" ]; then ln -sf "$f" "$HOME/.claude/commands/"; fi; done;
+      exit $rc
+    detect_type: path
+    detect_value: ~/dev/claude-skills
+    profiles: [core]
+
   - name: Codex CLI
     install_type: script
     install_command: "curl -fsSL https://chatgpt.com/codex/install.sh | sh"
